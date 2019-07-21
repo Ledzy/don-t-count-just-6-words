@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -8,14 +9,15 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="custom.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'custom.css' %}">
+    <script type="text/javascript" src="{% static 'bootstrap-4.3.1/js/bootstrap.min.js' %}"></script>
 
     
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-fixed-top navbar-dark bg-dark">
   <a class="navbar-brand" href="#">
-    <img src="light-bulb.svg" width="30" height="30" class="d-inline-block align-center" alt=""> 教师助手</a>
+    <img src="{% static 'bootstrap-4.3.1/img/light-bulb.svg' %}" width="30" height="30" class="d-inline-block align-center" alt=""> 教师助手</a>
 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -63,7 +65,7 @@
   <h1 class="display-4">欢迎！</h1>
   <p class="lead">在这里，开始你全新的备课体验</p>
   <hr class="my-4">
-  <p>点击按钮，开始你的第一趟智能备课之旅</p>
+  <p class = "lead lead2">点击按钮，开始你的第一趟智能备课之旅</p>
   <p class="lead">
     <a class="btn btn-primary btn-lg" href="#" role="button">开始备课</a>
   </p>
