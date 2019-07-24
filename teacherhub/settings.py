@@ -40,8 +40,9 @@ INSTALLED_APPS = [
     'prepare',
     'group_work',
     'schedule',
-    'slide',
     'assignment',
+    'chat',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -73,6 +74,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'teacherhub.wsgi.application'
+ASGI_APPLICATION = "teacherhub.routing.application"
 
 
 # Database
@@ -85,6 +87,14 @@ DATABASES = {
     }
 }
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
