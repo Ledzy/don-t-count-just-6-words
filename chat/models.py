@@ -8,7 +8,7 @@ User = get_user_model()
 
 class ChatRoom(models.Model):
     room_name = models.TextField(max_length=20,primary_key=True)
-    room_type = models.TextField(max_length=20)
+    room_type = models.TextField(max_length=20,null=True)
     create_date = models.DateTimeField(auto_now_add=True)
     member_count = models.IntegerField()
     members = models.ManyToManyField(User,related_name="in_room",null=True)
@@ -42,21 +42,19 @@ class Message(models.Model):
         
 
 
-class UserExtension(User):
-    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="extension",parent_link=True)
+class UserExtension(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="extension",parent_link=True,primary_key=True)
     rooms = models.ManyToManyField(ChatRoom,related_name="group_member",null=True)
     register_date = models.DateTimeField(auto_now_add=True)
     last_active = models.DateTimeField(auto_now=True)
-    portait = models.ImageField(null=True)
+    portrait = models.ImageField(null=True)
 
 
 @receiver(post_save,sender=User)
 def handler_user_extension(sender,instance,created,**kwargs):
     if created:
-        UserExtension.objects.create(user=instance)
+        # UserExtension.objects.create(user=instance)
+        pass
     else:
+        print('not created')
         instance.extension.save()
-
-
-
-

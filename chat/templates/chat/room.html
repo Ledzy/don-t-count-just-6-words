@@ -14,6 +14,9 @@
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
     <link rel="stylesheet" href="{% static 'style.css' %}" />
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
   </head>
 
 <body>
@@ -21,11 +24,11 @@
     <div id="sidepanel">
       <div id="profile">
         <div class="wrap">
-          <img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="online" alt="" />
-          <p>Mike Ross</p>
+          <img id="profile-img" src="/static/images/{{portrait}}" class="online" alt="" />
+          <p>{{username|safe}}</p>
           <i class="fa fa-chevron-down expand-button" aria-hidden="true"></i>
           <div id="status-options">
-            <ul>
+            <ul id="contact-list">
               <li id="status-online" class="active"><span class="status-circle"></span> <p>Online</p></li>
               <li id="status-away"><span class="status-circle"></span> <p>Away</p></li>
               <li id="status-busy"><span class="status-circle"></span> <p>Busy</p></li>
@@ -44,40 +47,32 @@
       </div>
       <div id="search">
         <label for=""><i class="fa fa-search" aria-hidden="true"></i></label>
-        <input type="text" placeholder="Search contacts..." />
+        <input type="text" placeholder="搜索小组..." />
       </div>
       <div id="contacts">
         <ul>
-          <li class="contact">
-            <div class="wrap">
-              <span class="contact-status online"></span>
-              <img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
-              <div class="meta" >
-                <p class="name">Louis Litt</p>
-                <p class="preview">You just got LITT up, Mike.</p>
-              </div>
-            </div>
-          </li>
-          <li class="contact active">
-            <div class="wrap">
-              <span class="contact-status busy"></span>
-              <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-              <div class="meta">
-                <p class="name">Harvey Specter</p>
-                <p class="preview">Wrong. You take the gun, or you pull out a bigger one. Or, you call their bluff. Or, you do any one of a hundred and forty six other things.</p>
-              </div>
-            </div>
-          </li>
         </ul>
       </div>
       <div id="bottom-bar">
-        <button id="addcontact"><i class="fa fa-user-plus fa-fw" aria-hidden="true"></i> <span>Add contact</span></button>
-        <button id="settings"><i class="fa fa-cog fa-fw" aria-hidden="true"></i> <span>Settings</span></button>
+        <!-- <button id="addcontact"><i class="fa fa-user-plus fa-fw" aria-hidden="true"></i> <span>添加小组</span></button> -->
+      
+
+      <div class="container">
+        <div class="row">
+          <!-- <h2>Slider Search box</h2> -->
+              <div class="search">
+      <input type="text"  class="form-control input-sm" maxlength="64" placeholder="Search" />
+       <button type="submit" class="btn btn-primary btn-sm" onclick="add_room()">搜索小组</button>
+       <button type="submit" class="btn btn-primary btn-sm" onclick="create_room()">创建小组</button>
       </div>
+        </div>
+      </div>
+    </div>
+
     </div>
     <div class="content">
       <div class="contact-profile">
-        <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+        <img src="/static/images/{{portrait}}" alt="" />
         <p>{{ username }}</p>
         <div class="social-media">
           <i class="fa fa-facebook" aria-hidden="true"></i>
@@ -99,7 +94,7 @@
       </div>
       <div class="message-input">
         <div class="wrap">
-        <input id="chat-message-input" type="text" placeholder="Write your message..." />
+        <input id="chat-message-input" type="text" placeholder="说点什么吧..." />
         <i class="fa fa-paperclip attachment" aria-hidden="true"></i>
         <button id="chat-message-submit" class="submit">
           <i class="fa fa-paper-plane" aria-hidden="true"></i>
@@ -114,6 +109,7 @@
 <script>
     var roomName = {{ room_name_json }};
     var username = {{ username }};
+    var portrait = "{{portrait}}";
 
     var chatSocket = new ReconnectingWebSocket(
         'ws://' + window.location.host +
@@ -131,7 +127,9 @@
           }
         } 
         else if (data['command'] === 'show_rooms') {
+          clean_room()
           for (let i=0; i<data['messages'].length; i++) {
+            console.log(i)
             showRooms(data['messages'][i]);
           }
           var contact_bar = document.getElementsByClassName('meta') 
@@ -160,7 +158,8 @@
         chatSocket.send(JSON.stringify({
             'command': 'new_message',
             'message': message,
-            'from': username
+            'from': username,
+            'room_name': room_name
         }));
 
         messageInputDom.value = '';
@@ -174,6 +173,7 @@
       else if (meta.className === "name"){
         room_name = meta.innerHTML
       }
+
       clean_chat()
       fecthMessages(room_name)
     }
@@ -193,10 +193,18 @@
 
     function clean_chat()  { 
       var div = document.getElementById("chat-log"); 
-      while(div.hasChildNodes()) //当div下还存在子节点时 循环继续 
+      while(div.hasChildNodes()) 
       { 
           div.removeChild(div.firstChild); 
       } 
+    }
+
+    function clean_room(){
+      var div = document.getElementById("contacts"); 
+      while(div.hasChildNodes())
+      { 
+          div.removeChild(div.firstChild); 
+      }
     }
 
 
@@ -210,6 +218,7 @@
       var nameTag = document.createElement('p');
       var previewTag = document.createElement('p');
       var imgTag = document.createElement('img')
+      var ul = document.createElement('ul')
 
       imgTag.src = "http://emilcarlsson.se/assets/harveyspecter.png";
       previewTag.className = 'preview';
@@ -230,7 +239,8 @@
       previewTag.textContent = "A quick demo";
 
       contacts = document.querySelector('#contacts');
-      ul = contacts.querySelector('ul');
+      contacts.appendChild(ul)
+      // ul = contacts.querySelector('ul');
       ul.appendChild(msgListTag);
       // contacts.appendChild(msgListTag);
     }
@@ -241,7 +251,7 @@
       var imgTag = document.createElement('img');
       var pTag = document.createElement('p');
       pTag.textContent = data.content;
-      imgTag.src = 'http://emilcarlsson.se/assets/mikeross.png';
+      imgTag.src = '/static/images/{{portrait}}';
       
       if (author === username) {
         msgListTag.className = 'sent';
@@ -251,6 +261,22 @@
       msgListTag.appendChild(imgTag);
       msgListTag.appendChild(pTag);
       document.querySelector('#chat-log').appendChild(msgListTag);
+    }
+
+    function add_room() {
+      var room_name = document.getElementsByClassName('form-control input-sm')[0].value;
+      chatSocket.send(JSON.stringify({
+        'command': 'add_room',
+        'from': username,
+        'room_name': room_name}));
+      }
+
+    function create_room() {
+      var room_name = document.getElementsByClassName('form-control input-sm')[0].value;
+      chatSocket.send(JSON.stringify({
+        'command': 'create_room',
+        'from': username,
+        'room_name': room_name}));
     }
 
 </script>

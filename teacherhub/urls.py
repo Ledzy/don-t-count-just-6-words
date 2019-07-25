@@ -24,5 +24,9 @@ urlpatterns = [
     path('group_work/', include('group_work.urls')),
     path('prepare/', include('prepare.urls')),
     path('assignment/', include('assignment.urls')),
-    path('chat/', include('chat.urls', namespace='chat'))
+    path('chat/', include('chat.urls', namespace='chat')),
+    path('login/',views.login_, name='login'),
+    path('signup/',views.signup_, name='signup'),
+    path('login-post', views.login_post),
+    path('signup-post',views.signup_post)
 ]

@@ -1,0 +1,38 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>登录到我的账户</title>
+<link href="{% static 'css/style.css' %}" rel='stylesheet' type='text/css' />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="App Loction Form,Login Forms,Sign up Forms,Registration Forms,News latter Forms,Elements"./>
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+</script>
+<!--webfonts-->
+
+<!--//webfonts-->
+</head>
+
+<body>
+	<h1>在这里，和全世界的老师们一起交流</h1>
+		<div class="app-location">
+			<h2>欢迎来到teacherhub!</h2>
+			<h2>注册</h2>
+			<div class="line"><span></span></div>
+			<div class="location"><img src="{% static 'images/location.png' %}" class="img-responsive" alt="" /></div>
+			<form action="/signup-post" method="post">
+				{% csrf_token %}
+				<input type="text" class="text" value="电子邮箱或手机号" name="username" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'E-mail address';}" >
+				<input type="password" value="Password" name="password" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Password';}">
+				<div class="submit"><input type="submit" value="登录" ></div>
+				<div class="clear"></div>
+				<div class="new">
+					<h3><a href="#">忘记密码</a></h3>
+					<h4><a href="/login">登录</a></h4>
+					<div class="clear"></div>
+				</div>
+			</form>
+		</div>
+</body>
+</html>
