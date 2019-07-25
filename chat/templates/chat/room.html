@@ -251,10 +251,11 @@
       var imgTag = document.createElement('img');
       var pTag = document.createElement('p');
       pTag.textContent = data.content;
-      imgTag.src = '/static/images/{{portrait}}';
+      
       
       if (author === username) {
         msgListTag.className = 'sent';
+        imgTag.src = '/static/images/{{portrait}}';
       } else {
         msgListTag.className = 'replies';
       }

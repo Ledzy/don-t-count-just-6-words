@@ -11,7 +11,7 @@ class ChatRoom(models.Model):
     room_type = models.TextField(max_length=20,null=True)
     create_date = models.DateTimeField(auto_now_add=True)
     member_count = models.IntegerField()
-    members = models.ManyToManyField(User,related_name="in_room",null=True)
+    members = models.ManyToManyField(User,related_name="in_room")
 
     def __str__(self):
         return self.room_name
@@ -24,9 +24,8 @@ class ChatRoom(models.Model):
 
 
 class Message(models.Model):
-    author = models.ForeignKey(User, related_name='author_messages', on_delete=models.CASCADE, default="Jonery")
-    sender = models.TextField(default="Jonery")
-    receiver = models.TextField(default="luoqijun")
+    author = models.ForeignKey(User, related_name='author_messages', on_delete=models.CASCADE)
+    sender = models.TextField(null=True)
     chat_room = models.ForeignKey(ChatRoom,on_delete=models.CASCADE,related_name="room_messages")
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -44,7 +43,7 @@ class Message(models.Model):
 
 class UserExtension(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="extension",parent_link=True,primary_key=True)
-    rooms = models.ManyToManyField(ChatRoom,related_name="group_member",null=True)
+    rooms = models.ManyToManyField(ChatRoom,related_name="group_member")
     register_date = models.DateTimeField(auto_now_add=True)
     last_active = models.DateTimeField(auto_now=True)
     portrait = models.ImageField(null=True)

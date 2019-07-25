@@ -20,21 +20,28 @@ class ChatConsumer(WebsocketConsumer):
 
     def fetch_messages(self, data):
         room_name = data['room_name']
-        room = ChatRoom.objects.filter(room_name=room_name)[0]
-        messages = room.room_messages.all()
-        content = {
-            'command': 'messages',
-            'messages': self.messages_to_json(messages)
-        }
-        print("send the message")
-        self.send_message(content)
+        try:
+            room = ChatRoom.objects.filter(room_name=room_name)[0]
+            messages = room.room_messages.all()
+            content = {
+                'command': 'messages',
+                'messages': self.messages_to_json(messages)
+            }
+            print("fetch the message")
+            self.send_message(content)
+        except Exception as e:
+            print(e)
 
     def add_room(self,data):
+        print('add room')
         username = data['from']
         user = User.objects.filter(username=username)[0]
         user = UserExtension.objects.filter(user=user)[0]
-        target_room = ChatRoom.objects.filter(room_name=data['room_name'])[0]
-        user.rooms.add(target_room)
+        try:
+            target_room = ChatRoom.objects.filter(room_name=data['room_name'])[0]
+            user.rooms.add(target_room)
+        except Exception as e:
+            print(e)
         self.fetch_messages(data)
 
         rooms = user.rooms.all()
@@ -42,6 +49,7 @@ class ChatConsumer(WebsocketConsumer):
         self.fetch_rooms(data)
 
     def create_room(self,data):
+        print('create room')
         target_room = ChatRoom.objects.create(room_name=data['room_name'],room_type='A', member_count=2)
         self.add_room(data)
 
@@ -50,7 +58,8 @@ class ChatConsumer(WebsocketConsumer):
         author_user = User.objects.filter(username=author)[0]
         room = ChatRoom.objects.filter(room_name=data['room_name'])[0]
         message = Message.objects.create(
-            author=author_user, 
+            author=author_user,
+            sender=author.username,
             content=data['message'],
             chat_room=room)
         content = {

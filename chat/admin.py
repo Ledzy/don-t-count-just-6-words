@@ -4,7 +4,7 @@ from .models import ChatRoom, Message, UserExtension
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('sender','receiver','content','chat_room')
+    list_display = ('sender','content','chat_room')
 
 @admin.register(ChatRoom)
 class ChatRoomAdmin(admin.ModelAdmin):
