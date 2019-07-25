@@ -52,7 +52,7 @@
             <div class="wrap">
               <span class="contact-status online"></span>
               <img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
-              <div class="meta">
+              <div class="meta" >
                 <p class="name">Louis Litt</p>
                 <p class="preview">You just got LITT up, Mike.</p>
               </div>
@@ -114,14 +114,13 @@
 <script>
     var roomName = {{ room_name_json }};
     var username = {{ username }};
-    console.log(roomName);
 
     var chatSocket = new ReconnectingWebSocket(
         'ws://' + window.location.host +
         '/ws/chat/' + roomName + '/');
 
     chatSocket.onopen = function(e) {
-      fetchMessages();
+      fetchRooms();
     }
 
     chatSocket.onmessage = function(e) {
@@ -130,7 +129,17 @@
           for (let i=0; i<data['messages'].length; i++) {
             createMessage(data['messages'][i]);
           }
-        } else if (data['command'] === 'new_message'){
+        } 
+        else if (data['command'] === 'show_rooms') {
+          for (let i=0; i<data['messages'].length; i++) {
+            showRooms(data['messages'][i]);
+          }
+          var contact_bar = document.getElementsByClassName('meta') 
+          for (let i=0; i<contact_bar.length; i++){
+          contact_bar[i].addEventListener("click",select_group,false)
+    }
+        }
+        else if (data['command'] === 'new_message'){
           createMessage(data['message']);
         }
     };
@@ -157,8 +166,73 @@
         messageInputDom.value = '';
     };
 
-    function fetchMessages() {
-      chatSocket.send(JSON.stringify({'command': 'fetch_messages' }));
+    function select_group(event){
+      var meta = event.target;
+      if (meta.className === "meta"){
+        room_name = meta.getElementsByClassName('name')[0].innerHTML;
+      }
+      else if (meta.className === "name"){
+        room_name = meta.innerHTML
+      }
+      clean_chat()
+      fecthMessages(room_name)
+    }
+
+    function fecthMessages(room_name) {
+      chatSocket.send(JSON.stringify({
+        'command': 'fetch_messages',
+        'sender': username,
+        'room_name': room_name}));
+    }
+
+    function fetchRooms() {
+      chatSocket.send(JSON.stringify({
+        'command': 'fetch_rooms',
+        'from': username}));
+    }
+
+    function clean_chat()  { 
+      var div = document.getElementById("chat-log"); 
+      while(div.hasChildNodes()) //当div下还存在子节点时 循环继续 
+      { 
+          div.removeChild(div.firstChild); 
+      } 
+    }
+
+
+    function showRooms(data) {
+      var roomName = data['room_name'];
+      var msgListTag = document.createElement('li');
+      // var contactTag = document.createElement('li');
+      var wrapTag = document.createElement('div');
+      var stateTag = document.createElement('span')
+      var metaTag = document.createElement('div');
+      var nameTag = document.createElement('p');
+      var previewTag = document.createElement('p');
+      var imgTag = document.createElement('img')
+
+      imgTag.src = "http://emilcarlsson.se/assets/harveyspecter.png";
+      previewTag.className = 'preview';
+      nameTag.className = 'name';
+      metaTag.className = 'meta';
+      wrapTag.className = 'wrap';
+      stateTag.className = 'contact-status busy';
+      msgListTag.className = 'contact';
+      // metaTag.onclick = "select_group(event)";
+
+      wrapTag.appendChild(stateTag);
+      wrapTag.appendChild(imgTag);
+      wrapTag.appendChild(metaTag);
+      metaTag.appendChild(nameTag);
+      metaTag.appendChild(previewTag);
+      msgListTag.appendChild(wrapTag);
+      nameTag.textContent = roomName;
+      previewTag.textContent = "A quick demo";
+
+      contacts = document.querySelector('#contacts');
+      ul = contacts.querySelector('ul');
+      ul.appendChild(msgListTag);
+      // contacts.appendChild(msgListTag);
     }
 
     function createMessage(data) {
